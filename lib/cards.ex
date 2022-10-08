@@ -1,4 +1,10 @@
 defmodule Cards do
+  @moduledoc """
+    Provides methods for creating and handling a deck of cards
+  """
+  @doc """
+    Returns a list of strings representing a list of playing cards
+  """
   def create_deck do
     values = [
       "Ace",
@@ -27,10 +33,29 @@ defmodule Cards do
     Enum.shuffle(deck)
   end
 
+  @doc """
+    Determines whether a deck contains a given card
+
+    ## Examples
+
+        iex> deck = Cards.create_deck
+        iex> Cards.contains?(deck, "Ace of Spades")
+        true
+  """
   def contains?(deck, card) do
     Enum.member?(deck, card)
   end
 
+  @doc """
+    Divides a deck into a hand and the remainder of the deck.  The `hand_size` argument indicates how many cards should be in the hand.
+
+    ## Examples
+
+        iex> deck = Cards.create_deck()
+        iex> {hand, deck} = Cards.deal(deck, 1)
+        iex> hand
+        ["Ace of Spades"]
+  """
   def deal(deck, hand_size) do
     Enum.split(deck, hand_size)
   end
@@ -41,14 +66,19 @@ defmodule Cards do
   end
 
   def load(filename) do
-    {status, binary} = File.read(filename)
-
-    case status do
-      :ok -> :erlang.binary_to_term(binary)
-      :error -> "That file does not exist"
+    case File.read(filename) do
+      {:ok, binary} -> :erlang.binary_to_term(binary)
+      {:error, _reason} -> "That file does not exist"
     end
+  end
+
+  def create_hand(hand_size) do
+    Cards.create_deck()
+    |> Cards.shuffle()
+    |> Cards.deal(hand_size)
   end
 end
 
 # Pattern matching is Elixir's replacement for variable assignment.
 # This means that any time you 'assign a variable' in Elixir, you are really engaging in pattern matching.  'one = 1' is the simplest form of pattern matching.
+# If you put in a hard corded value on the left side of a pattern, then you have to hard code the exact same pattern on the right side otherwise it will fail
